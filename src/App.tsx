@@ -1,26 +1,58 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { FunctionComponent } from 'react'
+import { useQuery } from '@apollo/client'
+import { RestaurantQuery } from './restaurant.query'
+import { Button, Card, CardActions, CardContent, Grid, makeStyles, Typography } from '@material-ui/core'
+import { GetRestaurants } from './__generated__/GetRestaurants'
 
-function App() {
+const useStyles = makeStyles({
+  root: {
+    minWidth: 275,
+  },
+  bullet: {
+    display: 'inline-block',
+    margin: '0 2px',
+    transform: 'scale(0.8)',
+  },
+  title: {
+    fontSize: 14,
+  },
+  pos: {
+    marginBottom: 12,
+  },
+})
+
+const App: FunctionComponent = () => {
+  const classes = useStyles()
+  const { data, loading } = useQuery<GetRestaurants>(RestaurantQuery)
+
+  if (loading || !data?.restaurants) {
+    return <Typography>Loading</Typography>
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Grid container spacing={3}>
+        {data.restaurants.map((restaurant) => (
+          <Grid item xs={4} key={restaurant.id}>
+            <Card>
+              <CardContent>
+                <Typography className={classes.title} color="textSecondary" gutterBottom>
+                  {restaurant.name}
+                </Typography>
+                <Typography className={classes.pos} color="textSecondary">
+                  adjective
+                </Typography>
+              </CardContent>
+
+              <CardActions>
+                <Button size="small">Learn More</Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
